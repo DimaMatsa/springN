@@ -1,6 +1,13 @@
 package com.matsa;
 
+import javax.persistence.*;
+
+@Entity
 public class Book {
+    @Id
+    @SequenceGenerator(name = "books", sequenceName = "books")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "books")
+    private Long id;
     private  String name;
     private String author;
     private String description;
@@ -18,6 +25,14 @@ public class Book {
         this.publisher = publisher;
         this.isbn = isbn;
         this.year = year;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
