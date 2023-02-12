@@ -1,30 +1,38 @@
 package com.matsa;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class BookController {
+    @Autowired
+    private BookService bookService;
+
     @GetMapping("/book")
-    private String hello() {
-        return "All the books";
+    private List<Book> book() {
+        return bookService.getAll();
     }
 
     @GetMapping("/book/{id}")
-    public String getBookById(@PathVariable Long id) {
-        return "Book by id " + id;
+    public Book getBookById(@PathVariable Long id) {
+        return bookService.get(id);
     }
 
     @PostMapping("/book")
-    public String createBook() {
-        return "Create new Book";
+    public Book createBook(@RequestBody Book book) {
+        return bookService.create(book);
     }
+
     @PutMapping("/book/{id}")
-    public String editBook(@PathVariable Long id){
-        return "Edit Book by id " + id;
+    public Book editBook(@PathVariable Long id, @RequestBody Book book) {
+        return bookService.update(id, book);
     }
+
     @DeleteMapping("/book/{id}")
-    public String deleteBook(@PathVariable Long id){
-        return "Delete a book by id " + id;
+    public void deleteBook(@PathVariable Long id) {
+        bookService.delete(id);
     }
 }
 
