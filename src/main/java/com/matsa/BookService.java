@@ -1,37 +1,49 @@
 package com.matsa;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
 @Service
 public class BookService {
+    @Autowired
+    public BookRepository bookRepository;
     public Book get(Long id) {
-        //get book by id from DB
-        Book testBook = new  Book("Incognito", "Buben", "pro Bubna", "Selo", "", 2000);
-        Book testBook2 = new  Book("Incognito2", "Buben2", "pro Bubna2", "Selo2", "", 2001);
-
-        return new Book();
+        Optional<Book> optional = bookRepository.findById(id);
+        if(optional.isPresent()){
+            return optional.get();
+        }
+        throw new RuntimeException("Book not found");
     }
 
     public List<Book> getAll() {
         //get all books from DB
-        Book testBook = new  Book("Incognito", "Buben", "pro Bubna", "Selo", "", 2000);
-        Book testBook2 = new  Book("Incognito2", "Buben2", "pro Bubna2", "Selo2", "", 2001);
-        return List.of(testBook,testBook2);
+        Iterator<Book> iterator = bookRepository.findAll().iterator();
+        List <Book> books = new ArrayList<>();
+        while (iterator.hasNext()){
+            books.add(iterator.next());
+        }
+        return books;
     }
 
     public Book create(Book book) {
-        //save book to DB
-        return book;
+        return bookRepository.save(book);
     }
 
     public Book update(Long id, Book book) {
-        //get book by id and update it
-        return book;
+        Book original = get(id);
+        original.setName(book.getName());
+        original.setAuthor(book.getAuthor());
+        original.setDescription(book.getDescription());
+        original.setIsbn(book.getIsbn());
+        original.setPublisher(book.getPublisher());
+        original.setYear(book.getYear());
+        return bookRepository.save(original);
     }
 
     public void delete(Long id) {
-        //delete book by id
+        Book book = get(id);
+        bookRepository.delete(book);
     }
 }
