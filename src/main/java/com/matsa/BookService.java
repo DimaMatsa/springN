@@ -1,6 +1,8 @@
 package com.matsa;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -17,14 +19,11 @@ public class BookService {
         throw new RuntimeException("Book not found");
     }
 
-    public List<Book> getAll() {
-        //get all books from DB
-        Iterator<Book> iterator = bookRepository.findAll().iterator();
-        List <Book> books = new ArrayList<>();
-        while (iterator.hasNext()){
-            books.add(iterator.next());
+    public Page<Book> getAll(String query, Pageable pageable) {
+        if(query != null){
+            return bookRepository.findByQuery("%" + query.toLowerCase() + "%",pageable);
         }
-        return books;
+        return bookRepository.findAll(pageable);
     }
 
     public Book create(Book book) {

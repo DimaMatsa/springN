@@ -1,6 +1,9 @@
 package com.matsa;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,8 +14,11 @@ public class BookController {
     private BookService bookService;
 
     @GetMapping("/book")
-    private List<Book> book() {
-        return bookService.getAll();
+    private Page<Book> getAllBooks(@RequestParam Integer page,
+                                   @RequestParam Integer size,
+                                   @RequestParam(required = false) String query) {
+        Pageable pageable = PageRequest.of(page, size);
+        return bookService.getAll(query, pageable);
     }
 
     @GetMapping("/book/{id}")
