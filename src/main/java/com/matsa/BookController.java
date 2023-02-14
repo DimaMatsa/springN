@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,7 +13,6 @@ import java.util.List;
 public class BookController {
     @Autowired
     private BookService bookService;
-
     @GetMapping("/book")
     private Page<Book> getAllBooks(@RequestParam Integer page,
                                    @RequestParam Integer size,
@@ -27,6 +27,7 @@ public class BookController {
     }
 
     @PostMapping("/book")
+    @ResponseStatus(code = HttpStatus.CREATED)
     public Book createBook(@RequestBody Book book) {
         return bookService.create(book);
     }
