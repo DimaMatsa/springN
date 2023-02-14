@@ -20,21 +20,21 @@ public class BookCommandLineRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (bookRepository.findAll().size() == 0) {
-            try{
+            try {
                 TypeReference<List<BookData>> typeReference = new TypeReference<List<BookData>>() {};
                 InputStream inputStream = TypeReference.class.getResourceAsStream(BOOKS_JSON);
-                List<BookData> books = new ObjectMapper().readValue(inputStream,typeReference);
-                if(books != null && !books.isEmpty()){
+                List<BookData> books = new ObjectMapper().readValue(inputStream, typeReference);
+                if (books != null && !books.isEmpty()) {
                     List<Book> bookList = new ArrayList<>();
-                    books.forEach(book -> bookList.add(new Book(book.getName(),book.getAuthor(),book.getDescription(),book.getPublisher(),book.getIsbn(), book.getYear())));
+                    books.forEach(book -> bookList.add(new Book(book.getName(), book.getAuthor(), book.getDescription(), book.getPublisher(), book.getIsbn(), book.getYear())));
                     List<Book> savedBookList = bookRepository.saveAll(bookList);
                     System.out.println(savedBookList.size());
                 }
-            } catch (IOException e){
+            } catch (IOException e) {
                 System.out.println("Unable to save books: " + e.getMessage());
             }
 
         }
-
     }
 }
+
