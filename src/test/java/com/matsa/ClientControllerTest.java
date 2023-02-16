@@ -128,7 +128,7 @@ public class ClientControllerTest {
     }
 
     @Test
-    void findClients() throws Exception {
+    void findClient() throws Exception {
         ClientDto testClient = mockClient();
         String json = objectMapper.writeValueAsString(testClient);
         mockMvc.perform(post("/client").contentType(MediaType.APPLICATION_JSON).content(json))
