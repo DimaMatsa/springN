@@ -22,7 +22,7 @@ public class ClientControllerTest extends AbstractControllerTest {
     ClientRepository clientRepository;
 
     @AfterEach
-    void clearAfterr() {
+    void clearAfter() {
         clientRepository.deleteAll();
     }
 
