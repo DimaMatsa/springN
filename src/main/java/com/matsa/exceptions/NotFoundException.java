@@ -1,4 +1,4 @@
-package com.matsa;
+package com.matsa.exceptions;
 
 public class NotFoundException extends RuntimeException{
     public NotFoundException (String message){

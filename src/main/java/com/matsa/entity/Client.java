@@ -1,5 +1,6 @@
-package com.matsa.clients;
+package com.matsa.entity;
 
+import com.matsa.dto.ClientDto;
 import lombok.*;
 import javax.persistence.*;
 

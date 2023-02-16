@@ -1,4 +1,4 @@
-package com.matsa;
+package com.matsa.dto;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;

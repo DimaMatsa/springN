@@ -1,38 +1,23 @@
-package com.matsa;
+package com.matsa.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.matsa.clients.Client;
-import com.matsa.clients.ClientDto;
-import com.matsa.clients.ClientRepository;
+import com.matsa.AbstractControllerTest;
+import com.matsa.dto.ClientDto;
+import com.matsa.entity.Client;
+import com.matsa.repository.ClientRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Testcontainers
-@SpringBootTest
-@AutoConfigureMockMvc
-public class ClientControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    ObjectMapper objectMapper;
-
+public class ClientControllerTest extends AbstractControllerTest {
     @Autowired
     ClientRepository clientRepository;
 
@@ -46,8 +31,9 @@ public class ClientControllerTest {
         ClientDto testDto = mockClient();
         createAndAssert(testDto);
     }
+
     @Test
-    void getAllClients() throws Exception{
+    void getAllClients() throws Exception {
         ClientDto testDto1 = mockClient();
         ClientDto testDto2 = new ClientDto();
         testDto2.setFirstName("Pedro");
@@ -59,8 +45,8 @@ public class ClientControllerTest {
         createAndAssert(testDto1);
 
         mockMvc.perform(get("/client")
-                .param("page", "0")
-                .param("size","10"))
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)))
@@ -71,21 +57,21 @@ public class ClientControllerTest {
 
         mockMvc.perform(get("/client")
                         .param("page", "0")
-                        .param("size","10")
-                .param("query",testDto1.getFirstName()))
+                        .param("size", "10")
+                        .param("query", testDto1.getFirstName()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.content.[0].firstName",is(testDto1.getFirstName())));
+                .andExpect(jsonPath("$.content.[0].firstName", is(testDto1.getFirstName())));
 
         mockMvc.perform(get("/client")
                         .param("page", "0")
-                        .param("size","10")
-                        .param("query",testDto2.getPhone()))
+                        .param("size", "10")
+                        .param("query", testDto2.getPhone()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.content.[0].phone",is(testDto2.getPhone())));
+                .andExpect(jsonPath("$.content.[0].phone", is(testDto2.getPhone())));
     }
 
     @Test
@@ -101,28 +87,29 @@ public class ClientControllerTest {
                 .andExpect(jsonPath("$.email", is(client.getEmail())))
                 .andExpect(jsonPath("$.phone", is(client.getPhone())));
     }
+
     @Test
-    void editClient() throws Exception{
+    void editClient() throws Exception {
         ClientDto dto = mockClient();
-        Client client =createAndAssert(dto);
+        Client client = createAndAssert(dto);
         dto.setFirstName("Mykola");
         mockMvc.perform(put("/client/" + client.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(client.getId().intValue())))
-                .andExpect(jsonPath("$.firstName",is(dto.getFirstName())));
+                .andExpect(jsonPath("$.firstName", is(dto.getFirstName())));
     }
 
     @Test
-    void deleteClient() throws Exception{
+    void deleteClient() throws Exception {
         ClientDto dto = mockClient();
         Client client = createAndAssert(dto);
         mockMvc.perform(get("/client/" + client.getId()))
                 .andExpect(status().isOk());
         mockMvc.perform(delete("/client/" + client.getId()))
-                        .andExpect(status().isOk());
+                .andExpect(status().isOk());
         mockMvc.perform(get("/client/" + client.getId()))
                 .andExpect(status().isNotFound());
     }
@@ -156,8 +143,8 @@ public class ClientControllerTest {
         dto.setEmail("wrong email");
         dto.setPhone("98-08909-08-98");
         mockMvc.perform(post("/client")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.name())))
@@ -166,8 +153,6 @@ public class ClientControllerTest {
                         "lastName is mandatory",
                         "email must match \"^\\S+@\\S+\\.\\S+$\"",
                         "phone must match \"^\\+380\\d{9}$\"")));
-
-
 
 
     }

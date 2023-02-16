@@ -1,4 +1,4 @@
-package com.matsa.clients;
+package com.matsa.dto;
 
 import lombok.Data;
 import javax.validation.constraints.NotBlank;

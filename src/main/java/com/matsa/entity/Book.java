@@ -1,10 +1,9 @@
-package com.matsa;
+package com.matsa.entity;
 
+import com.matsa.dto.BookDto;
 import lombok.*;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @Entity
 @Data

@@ -1,8 +1,8 @@
-package com.matsa.clients;
+package com.matsa.controller;
 
-import com.matsa.Book;
-import com.matsa.BookDto;
-import com.matsa.BookService;
+import com.matsa.dto.ClientDto;
+import com.matsa.entity.Client;
+import com.matsa.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,8 +20,8 @@ public class ClientController {
 
     @GetMapping("/client")
     private Page<Client> getAllClients(@RequestParam Integer page,
-                                   @RequestParam Integer size,
-                                   @RequestParam(required = false) String query) {
+                                       @RequestParam Integer size,
+                                       @RequestParam(required = false) String query) {
         Pageable pageable = PageRequest.of(page, size);
         return clientService.getAll(query, pageable);
     }

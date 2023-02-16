@@ -1,7 +1,7 @@
-package com.matsa.clients;
+package com.matsa.exceptions;
 
 public class ConflictException extends RuntimeException{
-    ConflictException(String message){
+    public ConflictException(String message){
         super(message);
     }
 }

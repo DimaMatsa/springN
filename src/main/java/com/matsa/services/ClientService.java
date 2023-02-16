@@ -1,13 +1,16 @@
-package com.matsa.clients;
+package com.matsa.services;
 
-import com.matsa.NotFoundException;
+import com.matsa.exceptions.NotFoundException;
+import com.matsa.exceptions.ConflictException;
+import com.matsa.dto.ClientDto;
+import com.matsa.entity.Client;
+import com.matsa.repository.ClientRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.validation.Valid;
 import java.util.Optional;
 @Slf4j
 @Service

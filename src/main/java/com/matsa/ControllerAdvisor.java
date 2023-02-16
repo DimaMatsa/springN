@@ -1,6 +1,7 @@
 package com.matsa;
 
-import com.matsa.clients.ConflictException;
+import com.matsa.exceptions.ConflictException;
+import com.matsa.exceptions.NotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
