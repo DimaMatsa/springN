@@ -1,24 +1,20 @@
 package com.matsa;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,9 +26,10 @@ class BookControllerTest {
     private MockMvc mockMvc;
     @Autowired
     ObjectMapper objectMapper;
+
     @Test
     void createBook() throws Exception {
-        Book testBook = mockBook();
+        BookDto testBook = mockBook();
         String json = objectMapper.writeValueAsString(testBook);
         MvcResult mvcResult = mockMvc.perform(post("/book").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andDo(print())
@@ -40,16 +37,17 @@ class BookControllerTest {
                 .andReturn();
         Book bookResult = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Book.class);
         assertThat(bookResult.getId(), notNullValue());
-        assertThat(bookResult.getName(),equalTo(testBook.getName()));
-        assertThat(bookResult.getAuthor(),equalTo(testBook.getAuthor()));
-        assertThat(bookResult.getDescription(),equalTo(testBook.getDescription()));
-        assertThat(bookResult.getPublisher(),equalTo(testBook.getPublisher()));
-        assertThat(bookResult.getIsbn(),equalTo(testBook.getIsbn()));
-        assertThat(bookResult.getYear(),equalTo(testBook.getYear()));
+        assertThat(bookResult.getName(), equalTo(testBook.getName()));
+        assertThat(bookResult.getAuthor(), equalTo(testBook.getAuthor()));
+        assertThat(bookResult.getDescription(), equalTo(testBook.getDescription()));
+        assertThat(bookResult.getPublisher(), equalTo(testBook.getPublisher()));
+        assertThat(bookResult.getIsbn(), equalTo(testBook.getIsbn()));
+        assertThat(bookResult.getYear(), equalTo(testBook.getYear()));
     }
+
     @Test
     void findBook() throws Exception {
-        Book testBook = mockBook();
+        BookDto testBook = mockBook();
         String json = objectMapper.writeValueAsString(testBook);
         mockMvc.perform(post("/book").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andDo(print())
@@ -66,14 +64,68 @@ class BookControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.content", hasSize(1)))
                 .andReturn();
 
-    };
-    private Book mockBook(){
-        Book testBook = new Book();
+    }
+
+    ;
+
+    @Test
+    void createBookValidation() throws Exception {
+        BookDto testBook = mockBook();
+        testBook.setName(null);
+        testBook.setAuthor("");
+        mockMvc.perform(post("/book").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testBook)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status", equalTo(HttpStatus.BAD_REQUEST.name())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors", containsInAnyOrder("name is mandatory", "author is mandatory")));
+        testBook = mockBook();
+        testBook.setIsbn("wrong format");
+        mockMvc.perform(post("/book").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testBook)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status", equalTo(HttpStatus.BAD_REQUEST.name())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors", containsInAnyOrder("isbn must match \"^(?=(?:\\D*\\d){10}(?:(?:\\D*\\d){3})?$)[\\d-]+$\"")));
+    }
+
+    @Test
+    void updateBookValidation() throws Exception {
+        BookDto testBook = mockBook();
+        testBook.setName(null);
+        testBook.setAuthor("");
+        mockMvc.perform(put("/book/1").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testBook)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status", equalTo(HttpStatus.BAD_REQUEST.name())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors", containsInAnyOrder("name is mandatory", "author is mandatory")));
+        testBook = mockBook();
+        testBook.setIsbn("wrong format");
+        mockMvc.perform(put("/book/1").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testBook)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status", equalTo(HttpStatus.BAD_REQUEST.name())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors", containsInAnyOrder("isbn must match \"^(?=(?:\\D*\\d){10}(?:(?:\\D*\\d){3})?$)[\\d-]+$\"")));
+    }
+
+    @Test
+    void getNotExistingBook() throws Exception {
+        mockMvc.perform(get("/book/123"))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("status", equalTo(HttpStatus.NOT_FOUND.name())))
+                .andExpect(MockMvcResultMatchers.jsonPath("errors", contains("Book not found")));
+    }
+
+    private BookDto mockBook() {
+        BookDto testBook = new BookDto();
         testBook.setName("Test name");
         testBook.setDescription("Test description");
         testBook.setAuthor("Test author");
         testBook.setPublisher("Test publisher");
-        testBook.setIsbn("Test isbn");
+        testBook.setIsbn("978-617-7866-64-9");
         testBook.setYear(2000);
         return testBook;
     }
