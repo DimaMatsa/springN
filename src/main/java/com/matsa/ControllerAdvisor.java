@@ -1,5 +1,6 @@
 package com.matsa;
 
+import com.matsa.clients.ConflictException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,5 +41,15 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
         );
         return new ResponseEntity<>(body,HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<Object> handleConflictException(ConflictException ex){
+        Map<String, Object> body = Map.of(
+                "timestamp",new Date(),
+                "status",HttpStatus.CONFLICT,
+                "errors", List.of(ex.getMessage())
+        );
+        return new ResponseEntity<>(body,HttpStatus.CONFLICT);
+    }
+
 
 }
